@@ -1,6 +1,9 @@
 package src.main.java.game;
 
 
+import src.main.java.game.Coordinate;
+import src.main.java.game.SuperSearchWordPersistenceException;
+
 import java.io.*;
 import java.util.*;
 
@@ -11,7 +14,7 @@ public class PlayGame {
 
     //possible directions relative to a point
     int[] x = {-1, -1, -1, 0, 0, 1, 1, 1 },
-            y = { -1, 0, 1, -1, 1, -1, 0, 1 };
+          y = { -1, 0, 1, -1, 1, -1, 0, 1 };
 
     public void PlayGame(String INPUT_DATA_FILE) throws SuperSearchWordPersistenceException {
         Scanner scanner;
@@ -42,11 +45,18 @@ public class PlayGame {
             numWords = Integer.parseInt(scanner.next()); //Number of possible valid words (given)
 
             // inputs for possible words to check
-            while (j < numWords) {
+            //while (j < numWords) {
+            while (scanner.hasNextLine()) {
                 possibleWords.add(scanner.next());
                 j++;
             }
         }
+
+        /* //correctly populates ArrayList<String>
+        for(String word : possibleWords){
+            System.out.println(word);
+        }
+        */
 
         //populate points (x , y) of board
         for (String s : boardInputs) {
@@ -65,36 +75,40 @@ public class PlayGame {
         if (mode.equals("NO_WRAP")) {
              noWrapSearch(n, m, boardArr, possibleWords);
         }
-        if(mode.equals("WRAPS")){
+        if(mode.equals("WRAP")){
             wrapSearch(n, m, boardArr, possibleWords);
         }
     }
-        public String noWrapSearch(int n, int m, String[][] board, ArrayList<String> possibleWords){
-            Map<String, Coordinate> map = new HashMap<>();
-            StringBuilder sb = new StringBuilder();
+        public void noWrapSearch(int n, int m, String[][] board, ArrayList<String> possibleWords){
+            Map<String, Coordinate> map = new HashMap<String, Coordinate>();
+
+            //display board to console
+            for(String[] row : board){
+                System.out.println(Arrays.toString(row));
+            }
+
             for(String word : possibleWords){
+                StringBuilder sb = new StringBuilder();
                 map.clear();
                 int len = word.length();
                 for(int i = 0; i < n; i++) {
                     for(int j = 0; j < m; j++) {
-
                             if(board[i][j].equals(String.valueOf(word.charAt(0)))) {
                                 Coordinate pt0 = new Coordinate();
                                 pt0.setX(i);
                                 pt0.setY(j);
                                 map.put(String.valueOf(word.charAt(0)), pt0);
-                                for (int c = 1; c < len; c++) { //for each letter find the direction
-                                //for (int d = 0; d < 8; d++) { //i is possible directions... 8 total
-                                    //for (int c = 1; c < len; c++) { //for each letter find the direction
-                                    for (int d = 0; d < 8; d++) { //i is possible directions... 8 total
-                                        int xd = i + x[d], yd = j + y[d];
-                                        System.out.println("xd = " + xd + " | yd = " + yd);
+                                for (int d = 0; d < 8; d++) { //i is possible directions... 8 total
+                                    for (int c = 1; c < len; c++) { //for each letter find the direction
+                                        int xd = i + (x[d] * c),
+                                            yd = j + (y[d] * c);
                                         if(xd >= n || xd < 0 || yd >= m || yd < 0){
-                                            break;
-                                        }else if(board[xd][yd].equals(String.valueOf(word.charAt(c)))){
+                                            continue;
+                                        }
+                                        if(board[xd][yd].equals(String.valueOf(word.charAt(c)))){
                                             Coordinate pt = new Coordinate();
-                                            pt.setX(x[d]);
-                                            pt.setY(y[d]);
+                                            pt.setX(xd);
+                                            pt.setY(yd);
                                             map.put(String.valueOf(word.charAt(c)), pt);
                                         }
                                     }
@@ -108,18 +122,17 @@ public class PlayGame {
                     firstPT = map.get(String.valueOf(word.charAt(0)));
                     lastPT = map.get(String.valueOf(word.charAt(len - 1)));
                     sb.append("(").append(firstPT.getX()).append(",").append(firstPT.getY()).append(")").append("(").append(lastPT.getX()).append(",").append(lastPT.getY()).append(")");
-                    System.out.println(sb.toString());
+                    //System.out.println(sb.toString());
                 } else {
                     sb.append("NOT FOUND");
-                    System.out.println(sb.toString());
+                    //System.out.println(sb.toString());
                 }
-                return sb.toString();
+                System.out.println(sb.toString());
                 }
-            return "Done";
             }
 
-        public String wrapSearch(int n, int m, String[][] board, ArrayList<String> possibleWords){
-            return "";
+        public void wrapSearch(int n, int m, String[][] board, ArrayList<String> possibleWords){
+
         }
 }
 
