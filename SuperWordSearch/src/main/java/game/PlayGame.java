@@ -71,23 +71,32 @@ public class PlayGame {
             boardArr[k] = row.toArray(new String[row.size()]);
         }
 
+        //DISPLAY BOARD TO CONSOLE
+        System.out.println("Board:");
+        for(String[] row : boardArr){
+            System.out.println(Arrays.toString(row));
+        }
+        System.out.println("");
 
         if (mode.equals("NO_WRAP")) {
-             noWrapSearch(n, m, boardArr, possibleWords);
+             for(String word: possibleWords){
+                 noWrapSearch(n, m, boardArr, word);
+             }
+            //noWrapSearch(n, m, boardArr, possibleWords);
         }
         if(mode.equals("WRAP")){
-            wrapSearch(n, m, boardArr, possibleWords);
+            for(String word: possibleWords){
+                noWrapSearch(n, m, boardArr, word);
+            }
+            //wrapSearch(n, m, boardArr, possibleWords);
         }
     }
-        public void noWrapSearch(int n, int m, String[][] board, ArrayList<String> possibleWords){
+        public void noWrapSearch(int n, int m, String[][] board, String word){
             Map<String, Coordinate> map = new HashMap<String, Coordinate>();
 
-            //display board to console
-            for(String[] row : board){
-                System.out.println(Arrays.toString(row));
-            }
 
-            for(String word : possibleWords){
+
+            //for(String word : possibleWords){
                 StringBuilder sb = new StringBuilder();
                 map.clear();
                 int len = word.length();
@@ -129,9 +138,9 @@ public class PlayGame {
                 }
                 System.out.println(sb.toString());
                 }
-            }
+            //}
 
-        public void wrapSearch(int n, int m, String[][] board, ArrayList<String> possibleWords){
+        public void wrapSearch(int n, int m, String[][] board, String word){
             //direction mapping according to index of arrays x & y
             int diagonalLeftUp = 0,
                 verticalUp = 1,
@@ -148,7 +157,7 @@ public class PlayGame {
                 System.out.println(Arrays.toString(row));
             }
 
-            for(String word : possibleWords) {
+            //for(String word : possibleWords) {
                 StringBuilder sb = new StringBuilder();
                 map.clear();
                 int len = word.length();
@@ -198,7 +207,7 @@ public class PlayGame {
                                         String[] temp = rightRotate(board[i], gap);
                                         String result = convertStringArrayToString(temp);
                                         if(result.equals(word)){
-                                            for(int hl = m; hl > j; hl--){
+                                            for(int hl = (m - 1); hl > j; hl--){
                                                 Coordinate pt = new Coordinate();
                                                 pt.setX(i);
                                                 pt.setY(hl);
@@ -222,7 +231,7 @@ public class PlayGame {
                                         for(int k = 0; k < n; k++){
                                             arr[k] = board[k][j];
                                         }
-                                        String[] temp = rightRotate(arr, i);
+                                        String[] temp = leftRotate(arr, i);
                                         String result = convertStringArrayToString(temp);
                                         if(result.equals(word)){
                                             for(int vd = 0; vd < i; vd++){
@@ -243,8 +252,53 @@ public class PlayGame {
                                         map.put(String.valueOf(word.charAt(c)), pt);
                                     }
                                     if(d == verticalUp && dy < 0){
-
+                                        String[] arr = new String[n];
+                                        for(int k = 0; k < n; k++){
+                                            arr[k] = board[k][j];
+                                        }
+                                        int gap = (n - 1) - i;
+                                        String[] temp = rightRotate(arr, gap);
+                                        String result = convertStringArrayToString(temp);
+                                        if(result.equals(word)){
+                                            for(int vu = (n - 1); vu > i; vu--){
+                                                Coordinate pt = new Coordinate();
+                                                pt.setX(vu);
+                                                pt.setY(j);
+                                                map.put(String.valueOf(word.charAt(c + vu)), pt);
+                                            }
+                                        }
+                                        continue;
                                     }
+                                    // CHECK DIAGONALS:
+                                    //DIAGONAL RIGHT DOWN:
+                                    if(d == diagonalRightDown && board[dx][dy].equals(String.valueOf(word.charAt(c))) && dy < m && dx < n){
+                                        Coordinate pt = new Coordinate();
+                                        pt.setX(dx);
+                                        pt.setY(dy);
+                                        map.put(String.valueOf(word.charAt(c)), pt);
+                                    }
+                                    if(d == diagonalRightDown && dy >= m || dx >= n){
+                                        //Check top of board
+                                        if(arrayContains(board[0], String.valueOf(word.charAt(c)))){
+                                            //check top of board for next letter
+                                            for(int s = 0; s < board[0].length; s++){
+                                                if(board[0][s].equals(String.valueOf(word.charAt(c)))){
+                                                    int new_i = 0,
+                                                        new_j = s;
+                                                    //check if c + 1 is Diagonal Right Down
+                                                    if(board[new_i + x[diagonalRightDown]][new_j + y[diagonalRightDown]].equals(String.valueOf(word.charAt(c+1)))){
+                                                        i = new_i;
+                                                        j = new_j;
+
+
+
+                                                    }
+                                                    c++;
+                                                }
+                                            }
+                                        }
+                                    }
+
 
                                 }
                             }
@@ -279,7 +333,7 @@ public class PlayGame {
                 }
                 System.out.println(sb.toString());
             }
-        }
+        //}
 
         public static String[] leftRotate(String[] array, int rotations){
             int n = array.length;
@@ -356,6 +410,11 @@ public class PlayGame {
                 sb.append(str);
             }
             return sb.toString();
+        }
+
+        public static boolean arrayContains(String[] array, String s){
+            List<String> stringList = new ArrayList<>(Arrays.asList(array));
+            return stringList.contains(s);
         }
 }
 
