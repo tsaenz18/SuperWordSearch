@@ -17,6 +17,7 @@ public class PlayGame {
           y = { -1, 0, 1, -1, 1, -1, 0, 1 };
 
     Map<String, Coordinate> wrapMap = new HashMap<String, Coordinate>();
+    Map<String, String> displayMap = new HashMap<>();
 
     public void PlayGame(String INPUT_DATA_FILE) throws SuperSearchWordPersistenceException {
         Scanner scanner;
@@ -88,8 +89,13 @@ public class PlayGame {
         }
         if(mode.equals("WRAP")){
             for(String word: possibleWords){
+                displayMap.put(word, "NOT FOUND");
                 wrapMap.clear();
                 wrapSearch(n, m, boardArr, word);
+            }
+            for(Map.Entry<String, String> entry : displayMap.entrySet()){
+                System.out.println(entry.getKey() + ":");
+                System.out.println(entry.getValue());
             }
             //wrapSearch(n, m, boardArr, possibleWords);
         }
@@ -376,9 +382,10 @@ public class PlayGame {
                 Coordinate lastPT = new Coordinate();
                 firstPT = wrapMap.get(String.valueOf(word.charAt(0)));
                 lastPT = wrapMap.get(String.valueOf(word.charAt(len - 1)));
-                System.out.println(word + ":");
+                //System.out.println(word + ":");
                 sb.append("(").append(firstPT.getX()).append(",").append(firstPT.getY()).append(")").append("(").append(lastPT.getX()).append(",").append(lastPT.getY()).append(")");
-                System.out.println(sb.toString());
+                displayMap.put(word, sb.toString());
+                //System.out.println(sb.toString());
             }
             //System.out.println(sb.toString());
         }
